@@ -76,8 +76,8 @@ def make_image_from_buffer(hCaptureBitmap):
         DIB_RGB_COLORS
     )
 
-    bmp_info.bmiHeader.biSizeImage = int( bmp_info.bmiHeader.biWidth *abs(bmp_info.bmiHeader.biHeight) * (bmp_info.bmiHeader.biBitCount+7)/8 );
-    size = (bmp_info.bmiHeader.biWidth, bmp_info.bmiHeader.biHeight )
+    bmp_info.bmiHeader.biSizeImage = int( bmp_info.bmiHeader.biWidth *abs(bmp_info.bmiHeader.biHeight) * (bmp_info.bmiHeader.biBitCount+7)/8 )
+    size = ( bmp_info.bmiHeader.biWidth, bmp_info.bmiHeader.biHeight)
     #print (size)
     pBuf = (c_char * bmp_info.bmiHeader.biSizeImage)()
 

@@ -22,14 +22,14 @@ def main():
 def getRulerData():
 	
 	#Find the ruler window from google earth
-	rulerWindow = win32gui.FindWindow(None, 'Ruler')
+	rulerWindow = win32gui.FindWindow('Qt5QWindowToolSaveBits', None)
 	
 	if not rulerWindow:
 		print("Unable to find ruler window")
 		return null
 	
 	box = win32gui.GetWindowRect(rulerWindow)
-	bitmap = get_screen_buffer(box)
+	bitmap = get_screen_buffer((box[0], box[1], box[2]+400, box[3]+200))
 	img = make_image_from_buffer(bitmap)
 
 	#Make the image larger so the characters can be detected better
@@ -40,6 +40,8 @@ def getRulerData():
 
 	#Convert the image into readable data to use
 	text = pytesseract.image_to_string(img)
+
+	print(text)
 
 	#Get the map length value from the ruler image
 	ml1 = re.search(r"(Map Length:.+\d)", text)
@@ -141,14 +143,13 @@ def createMainWindow():
 		)
 	
 	clicked = StringVar()
-	clicked.set("Point")
-	pointT = clicked.get()
+	clicked.set("point")
 	
 	pointDrop = OptionMenu(pointTypeFrame,
 		clicked,
-		"Point", 
-		"Point15",
-		"Point2"
+		"point", 
+		"point15",
+		"point2"
 		)
 	pointDrop.configure(bg = "White")
 	
@@ -182,7 +183,7 @@ def createMainWindow():
 		width = 25,
 		height = 2,
 		bg = "White",
-		command=lambda: calculatePoint(pointT, originEntry.get())
+		command=lambda: calculatePoint(clicked.get(), originEntry.get())
 		)
 		
 	cmdSetup.grid(row=0,column=1)
