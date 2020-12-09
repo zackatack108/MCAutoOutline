@@ -26,11 +26,11 @@ def getRulerData():
 	
 	box = win32gui.GetWindowRect(rulerWindow)	
 	robot = Robot()	
-	img = robot.take_screenshot((box[0], box[1], box[2]+400, box[3]+200))
+	img = robot.take_screenshot((box[0]-20, box[1]-20, box[2]+400, box[3]+200))
 	
 	#Make the image larger so the characters can be detected better
 	width, height = img.size
-	newsize = ((width*4), (height*4))
+	newsize = ((width*5), (height*5))
 	img = img.resize(newsize)
 	img.save('enhanced.png')	
 
