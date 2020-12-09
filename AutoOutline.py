@@ -7,17 +7,13 @@ import pytesseract
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract'
 
 from tkinter import *
-from duelMonitor import *
+from pyrobot import Robot
 
 def main():
 	
 	root = createMainWindow()
 	
-	#rulerData = getRulerData()
-	#sendMinecraftMessage(rulerData)
-	
 	root.mainloop()
-
 	
 def getRulerData():
 	
@@ -28,15 +24,15 @@ def getRulerData():
 		print("Unable to find ruler window")
 		return null
 	
-	box = win32gui.GetWindowRect(rulerWindow)
-	bitmap = get_screen_buffer((box[0], box[1], box[2]+400, box[3]+200))
-	img = make_image_from_buffer(bitmap)
-
+	box = win32gui.GetWindowRect(rulerWindow)	
+	robot = Robot()	
+	img = robot.take_screenshot((box[0], box[1], box[2]+400, box[3]+200))
+	
 	#Make the image larger so the characters can be detected better
 	width, height = img.size
-	newsize = ((width*5), (height*5))
+	newsize = ((width*4), (height*4))
 	img = img.resize(newsize)
-	img.save('enhanced.png')
+	img.save('enhanced.png')	
 
 	#Convert the image into readable data to use
 	text = pytesseract.image_to_string(img)
@@ -44,17 +40,17 @@ def getRulerData():
 	print(text)
 
 	#Get the map length value from the ruler image
-	ml1 = re.search(r"(Map Length:.+\d)", text)
+	ml1 = re.search(r"(Map .+:.+\d)", text)
 	mt1 = ml1.group()
-	ml2 = re.search(r"[^Map Length:]+", mt1)
+	ml2 = re.search(r"(\d.+)", mt1)
 	mt2 = ml2.group()
 	mt3 = mt2.replace(',', '')
 	length = mt3
 
 	#Get the heading value from the ruler image
-	h1 = re.search(r"(Heading:.+\d)", text)
+	h1 = re.search(r"(Head.+:.+\d)", text)
 	ht1 = h1.group()
-	h2 = re.search(r"[^Heading:]+", ht1)
+	h2 = re.search(r"(\d.+)", ht1)
 	ht2 = h2.group()
 	heading = ht2
 	
