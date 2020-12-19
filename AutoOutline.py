@@ -3,16 +3,24 @@ import win32com.client
 import re
 import keyboard
 import pytesseract
+import ctypes
+import win32api
+import time
 
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract'
 
 from tkinter import *
 from pyrobot import Robot
 
+user32 = ctypes.windll.user32
+
 def main():
 	
-	root = createMainWindow()
-	
+	awareness = ctypes.c_int()
+	errorCode = ctypes.windll.shcore.GetProcessDpiAwareness(0, ctypes.byref(awareness))	
+	errorCode = ctypes.windll.shcore.SetProcessDpiAwareness(2)
+
+	root = createMainWindow()	
 	root.mainloop()
 	
 def getRulerData():
@@ -23,40 +31,50 @@ def getRulerData():
 	if not rulerWindow:
 		print("Unable to find ruler window")
 		return null
-	
+			
 	box = win32gui.GetWindowRect(rulerWindow)	
+	
+	left = round(box[0])
+	top = round(box[1])
+	right = round(box[2])
+	bottom = round(box[3])	
+	
 	robot = Robot()	
-	img = robot.take_screenshot((box[0]-20, box[1]-20, box[2]+400, box[3]+200))
+	img = robot.take_screenshot((left, top, right, bottom))
 	
 	#Make the image larger so the characters can be detected better
 	width, height = img.size
-	newsize = ((width*5), (height*5))
+	newsize = ((width*6), (height*6))
 	img = img.resize(newsize)
-	img.save('enhanced.png')	
+	#img.save('enhanced.png')	
 
 	#Convert the image into readable data to use
 	text = pytesseract.image_to_string(img)
-
-	print(text)
-
-	#Get the map length value from the ruler image
-	ml1 = re.search(r"(Map .+:.+\d)", text)
-	mt1 = ml1.group()
-	ml2 = re.search(r"(\d.+)", mt1)
-	mt2 = ml2.group()
-	mt3 = mt2.replace(',', '')
-	length = mt3
-
-	#Get the heading value from the ruler image
-	h1 = re.search(r"(Head.+:.+\d)", text)
-	ht1 = h1.group()
-	h2 = re.search(r"(\d.+)", ht1)
-	ht2 = h2.group()
-	heading = ht2
 	
-	#Put the length and heading into a single string and return it
-	rulerdata = length + " " + heading
-	return rulerdata
+	try:
+
+		#Get the map length value from the ruler image
+		ml1 = re.search(r"(Map .+:.+\d)", text)
+		mt1 = ml1.group()
+		ml2 = re.search(r"(\d.+)", mt1)
+		mt2 = ml2.group()
+		mt3 = mt2.replace(',', '')
+		length = mt3
+
+		#Get the heading value from the ruler image
+		h1 = re.search(r"(Head.+:.+\d)", text)
+		ht1 = h1.group()
+		h2 = re.search(r"(\d.+)", ht1)
+		ht2 = h2.group()
+		heading = ht2
+	
+		#Put the length and heading into a single string and return it
+		rulerdata = length + " " + heading
+		return rulerdata
+	
+	except:
+		print("Unable to read values")
+		return 0
 
 def sendMinecraftMessage(rulerData, pointType, origin):
 	
@@ -66,6 +84,23 @@ def sendMinecraftMessage(rulerData, pointType, origin):
 	minecraft = win32gui.GetFocus()
 	
 	minMessage = '/' + pointType + ' ' + origin + ' ' + rulerData
+	
+	shell = win32com.client.Dispatch('WScript.Shell')
+	
+	for x in minMessage:
+		shell.SendKeys(x)
+		
+	keyboard.press_and_release('enter')
+	keyboard.press_and_release('t')
+	
+def sendConnectMessage():
+	
+	#Find the minecraft window
+	minecraftWindow = win32gui.FindWindow("GLFW30", None)
+	win32gui.SetForegroundWindow(minecraftWindow)
+	minecraft = win32gui.GetFocus()
+	
+	minMessage = '/pointsconnect'
 	
 	shell = win32com.client.Dispatch('WScript.Shell')
 	
@@ -163,14 +198,12 @@ def createMainWindow():
 		text="Yes", 
 		variable=r, 
 		value=True, 
-		command=lambda: selected(r.get()),
 		bg = "#5DADE2"
 		)
 	r2 = Radiobutton(rFrame, 
 		text="No", 
 		variable=r, 
 		value=False, 
-		command=lambda: selected(r.get()),
 		bg = "#5DADE2"
 		)
 		
@@ -179,7 +212,7 @@ def createMainWindow():
 		width = 25,
 		height = 2,
 		bg = "White",
-		command=lambda: calculatePoint(clicked.get(), originEntry.get())
+		command=lambda: calculatePoint(clicked.get(), originEntry.get(), r.get())
 		)
 		
 	cmdSetup.grid(row=0,column=1)
@@ -203,13 +236,14 @@ def createMainWindow():
 	
 	return root
 	
-def calculatePoint(pointType, origin):
+def calculatePoint(pointType, origin, radio):
+		
 	rulerData = getRulerData()
-	sendMinecraftMessage(rulerData, pointType, origin)
-	
-	
-def selected(value):
-	#radio button code here
-	line = value
+		
+	if rulerData != 0:
+		sendMinecraftMessage(rulerData, pointType, origin)
+		time.sleep(1)
+		if radio != False:
+			sendConnectMessage()
 	
 main()
