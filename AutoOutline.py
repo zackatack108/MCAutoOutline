@@ -59,6 +59,7 @@ def getRulerData():
 		ml2 = re.search(r"(\d.+)", mt1)
 		mt2 = ml2.group()
 		mt3 = mt2.replace(',', '')
+		mt3 = mt2.replace(' ', '')
 		length = mt3
 
 		#Get the heading value from the ruler image
@@ -66,7 +67,8 @@ def getRulerData():
 		ht1 = h1.group()
 		h2 = re.search(r"(\d.+)", ht1)
 		ht2 = h2.group()
-		heading = ht2
+		ht3 = ht2.replace(',', '.')
+		heading = ht3
 	
 		#Put the length and heading into a single string and return it
 		rulerdata = length + " " + heading
