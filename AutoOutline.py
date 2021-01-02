@@ -59,8 +59,8 @@ def getRulerData():
 		ml2 = re.search(r"(\d.+)", mt1)
 		mt2 = ml2.group()
 		mt3 = mt2.replace(',', '')
-		mt3 = mt2.replace(' ', '')
-		length = mt3
+		mt4 = mt3.replace(' ', '')
+		length = mt4
 
 		#Get the heading value from the ruler image
 		h1 = re.search(r"(Head.+:.+\d)", text)
