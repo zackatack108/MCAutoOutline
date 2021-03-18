@@ -60,15 +60,20 @@ def getRulerData():
 		mt2 = ml2.group()
 		mt3 = mt2.replace(',', '')
 		mt4 = mt3.replace(' ', '')
-		length = mt4
+		mt5 = mt4.replace('.', '')
+		mt6 = "%.2f" % (int(mt5) / 100.00)		
+		length = mt6
 
 		#Get the heading value from the ruler image
 		h1 = re.search(r"(Head.+:.+\d)", text)
 		ht1 = h1.group()
 		h2 = re.search(r"(\d.+)", ht1)
 		ht2 = h2.group()
-		ht3 = ht2.replace(',', '.')
-		heading = ht3
+		ht3 = ht2.replace(',', '')
+		ht4 = ht3.replace(' ', '')
+		ht5 = ht4.replace('.', '')
+		ht6 = "%.2f" % (int(ht5) / 100.00)
+		heading = ht6
 	
 		#Put the length and heading into a single string and return it
 		rulerdata = length + " " + heading
