@@ -46,7 +46,7 @@ def getRulerData(picSize):
 	width, height = img.size
 	newsize = ((width*int(picSize)), (height*int(picSize)))
 	img = img.resize(newsize)
-	#img.save('enhanced.png')	
+	img.save('enhanced.png')	
 
 	#Convert the image into readable data to use
 	text = pytesseract.image_to_string(img)
