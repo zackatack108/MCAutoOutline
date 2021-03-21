@@ -23,7 +23,7 @@ def main():
 	root = createMainWindow()	
 	root.mainloop()
 	
-def getRulerData():
+def getRulerData(picSize):
 	
 	#Find the ruler window from google earth
 	rulerWindow = win32gui.FindWindow('Qt5QWindowToolSaveBits', None)
@@ -44,7 +44,7 @@ def getRulerData():
 	
 	#Make the image larger so the characters can be detected better
 	width, height = img.size
-	newsize = ((width*6), (height*6))
+	newsize = ((width*int(picSize)), (height*int(picSize)))
 	img = img.resize(newsize)
 	#img.save('enhanced.png')	
 
@@ -81,6 +81,7 @@ def getRulerData():
 	
 	except:
 		print("Unable to read values")
+		print(text)
 		return 0
 
 def sendMinecraftMessage(rulerData, pointType, origin):
@@ -141,6 +142,12 @@ def createMainWindow():
 		height=10,
 		bg = "#5DADE2"
 		)
+	
+	picSizeFrame = Frame(cmdSetupFrame,
+		width=20,
+		height=10,
+		bg = "#5DADE2"
+		)
 		
 	connectPointsFrame = Frame(root,
 		width=20,
@@ -163,15 +170,28 @@ def createMainWindow():
 		
 	originPoint = Label(originFrame,
 		text = "Origin Point",
-		width = 20,
+		width = 10,
 		height = 2,
 		bg = "#5DADE2"
 		)
 		
 	originEntry = Entry(originFrame,
-		width = 20,
+		width = 10,
 		bg = "White"
 		)
+		
+	picSize = Label(picSizeFrame,
+		text = "Picture Expansion by",
+		width = 15,
+		height = 2,
+		bg = "#5DADE2"
+		)
+		
+	picSizeEntry = Entry(picSizeFrame,
+		width = 10,
+		bg = "White"
+		)
+	picSizeEntry.insert(0, "6")
 		
 	pointType = Label(pointTypeFrame,
 		text = "Point type",
@@ -219,7 +239,7 @@ def createMainWindow():
 		width = 25,
 		height = 2,
 		bg = "White",
-		command=lambda: calculatePoint(clicked.get(), originEntry.get(), r.get())
+		command=lambda: calculatePoint(clicked.get(), originEntry.get(), picSizeEntry.get(), r.get())
 		)
 		
 	cmdSetup.grid(row=0,column=1)
@@ -234,6 +254,10 @@ def createMainWindow():
 	originPoint.pack()
 	originEntry.pack()
 	
+	picSizeFrame.grid(row=0,column=2)
+	picSize.pack()
+	picSizeEntry.pack()
+	
 	connectPointsFrame.grid(row=2,column=1)
 	connectPoints.pack()
 	rFrame.pack()
@@ -243,9 +267,9 @@ def createMainWindow():
 	
 	return root
 	
-def calculatePoint(pointType, origin, radio):
+def calculatePoint(pointType, origin, picSize, radio):
 		
-	rulerData = getRulerData()
+	rulerData = getRulerData(picSize)
 		
 	if rulerData != 0:
 		sendMinecraftMessage(rulerData, pointType, origin)
