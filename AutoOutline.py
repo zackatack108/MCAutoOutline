@@ -26,7 +26,8 @@ def main():
 def getRulerData(picSize):
 	
 	#Find the ruler window from google earth
-	rulerWindow = win32gui.FindWindow('Qt5QWindowToolSaveBits', None)
+	#rulerWindow = win32gui.FindWindow('Qt5QWindowToolSaveBits', None)
+	rulerWindow = win32gui.FindWindow(None, 'Ruler')
 	
 	if not rulerWindow:
 		print("Unable to find ruler window")
@@ -46,7 +47,7 @@ def getRulerData(picSize):
 	width, height = img.size
 	newsize = ((width*int(picSize)), (height*int(picSize)))
 	img = img.resize(newsize)
-	img.save('enhanced.png')	
+	#img.save('enhanced.png')	
 
 	#Convert the image into readable data to use
 	text = pytesseract.image_to_string(img)
